@@ -1,7 +1,11 @@
 .login{
     margin: auto;
     width: 20%;
-    box-shadow: 10px 10px 10px gray;
     padding: 10px;
-    margin-top: 300px;
+    margin-top: 180px;
 }
+.poppins-semibold,h6,p {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+  }
