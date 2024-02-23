@@ -1,22 +1,27 @@
-
-    <?php
+<?php
 class ConexionBD {
     private $conexion;
+    private $publicKeyPath;
 
-    public function __construct($db) {
+    public function __construct($db, $publicKeyPath) {
         $this->conexion = $db;
+        $this->publicKeyPath = $publicKeyPath;
     }
 
-    public function insertarUsuario($Matricula, $Name, $psw) {
+    public function insertarUsuario($Matricula, $Materia, $Calificacion) {
         try {
-            // Hashear la contraseña usando bcrypt
-            $psw_hash = password_hash($psw, PASSWORD_BCRYPT);
+            // Obtener la clave pública
+            $publicKey = openssl_pkey_get_public(file_get_contents($this->publicKeyPath));
 
-            $consulta = "INSERT INTO users (Matricula, Name, psw) VALUES (?, ?, ?)";
+            // Cifrar la matrícula usando la clave pública
+            openssl_public_encrypt($Matricula, $Matricula_encrypted, $publicKey);
+
+
+            $consulta = "INSERT INTO materias (Matricula, Materia, Calificacion) VALUES (?, ?, ?)";
             $declaracion = $this->conexion->prepare($consulta);
-            $declaracion->bindParam(1, $Matricula);
-            $declaracion->bindParam(2, $Name);
-            $declaracion->bindParam(3, $psw_hash);
+            $declaracion->bindParam(1, $Matricula_encrypted);
+            $declaracion->bindParam(2, $Materia);
+            $declaracion->bindParam(3, $Calificacion);
 
             $declaracion->execute();
             return true;
@@ -29,28 +34,31 @@ class ConexionBD {
 // Incluir la clase de conexión a la base de datos
 require_once('Connection/cdb.php');
 
+// Ruta a la clave pública
+$publicKeyPath = 'public_key.pem';
+
 // Crear una instancia de la clase Database
 $database = new Database();
 
 // Obtener la conexión a la base de datos
 $db = $database->getConnection();
 
-// Crear una instancia de la clase ConexionBD y pasarle la conexión
-$conexionBD = new ConexionBD($db);
+// Crear una instancia de la clase ConexionBD y pasarle la conexión y la clave pública
+$conexionBD = new ConexionBD($db, $publicKeyPath);
 
 // Procesar el formulario si se ha enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Matricula = $_POST["Matricula"];
-    $Name = $_POST["Name"];
-    $psw = $_POST["psw"];
+    $Materia = $_POST["Materia"];
+    $Calificacion = $_POST["Calificacion"];
     
 
     // Insertar el nuevo usuario en la base de datos
-    $registroExitoso = $conexionBD->insertarUsuario($Matricula, $Name, $psw);
+    $registroExitoso = $conexionBD->insertarUsuario($Matricula, $Materia, $Calificacion);
 
     if ($registroExitoso) {
         // Registro exitoso, redirigir a la página de inicio de sesión
-        header("Location: login.php");
+        header("Location: inicio.php");
         exit();
     } else {
         // Error en el registro, mostrar mensaje
@@ -93,10 +101,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
        
         <div class="mb-3">
-        <input type="text" class="form-control poppins-semibold" id="Name" name="Name" required placeholder="Ingresa tu nombre">
+        <input type="text" class="form-control poppins-semibold" id="Materia" name="Materia"  placeholder="Registar Materia">
     </div>
     <div>
-        <input type="password" class="form-control poppins-semibold" id="psw" name="psw" placeholder="Ingresa tu contraseña" required>
+        <input type="text" class="form-control poppins-semibold" id="Calificacion" name="Calificacion" placeholder="Registar calificacion" >
         </div>
         </div>
                 <div class="d-grid gap-2 col-6 mx-auto">
@@ -119,4 +127,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 </body>
 </html>
-

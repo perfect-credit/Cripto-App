@@ -68,6 +68,7 @@ class Authenticator {
             $_SESSION['idUsers'] = $Matricula['idUsers'];
             $_SESSION['Matricula'] = $Matricula['Matricula'];
             $_SESSION['psw'] = $Matricula['psw'];
+            $_SESSION['Name'] = $Matricula['Name'];
             return true;
         } else {
             return false;

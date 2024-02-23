@@ -12,57 +12,101 @@ require_once('Connection/cdb.php')
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3CPS Sistema escolar</title>
+  <title>3CPS Universidad agronoma</title>
   <!-- Agrega enlaces a los archivos de Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+  <!--- Google Font--->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/login.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
 <body>
   <div class="container mt-5">
-    <h1 class="text-center">Sistema Escolar</h1>
+    <h1 class="text-center">Sistema Escolar 3CPS</h1>
+</div>
 
-    <!-- Barra de navegación -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+<!-- Barra de navegación -->
+<nav class="navbar navbar-expand-lg bg-body-tertiary" >
+<form class="container-fluid justify-content-start">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Bienvenido <?php echo $_SESSION['Matricula']; ?></a>
+    <a class="navbar-brand" href="#">Bienvenido <?php echo $_SESSION['Name']; ?></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Inicio</a>
-        </li>
-       
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Maestros
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Captura de calificaciones</a></li>
-            <li><a class="dropdown-item" href="#">Asignaturas</a></li>
-            <li><a class="dropdown-item" href="#">Horarios</a></li>
-          </ul>
-          <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-           Alumnos 
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Calificaciones</a></li>
-            <li><a class="dropdown-item" href="#">Horarios y materias</a></li>
-            <li><a class="dropdown-item" href="#">Evaluaciones</a></li>
-          </ul>          
-        </li>
-      </ul>
-      
-    </div>
+  
     <ul class="nav justify-content-end">
+    <ul class="nav justify-content-end">
+    <a class="nav-link active" aria-current="page" href="Actions/SignOut.php">Capturar</a>
+  </li>
+</ul>
+
+
   <li class="nav-item">
     <a class="nav-link active" aria-current="page" href="Actions/SignOut.php">Cerrar sesión</a>
   </li>
 </ul>
+
+
   </div>
 </nav>
 
+<div class="container mt-5">
+    <h1 class="text-center">Tabla de Calificaciones</h1>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Matrícula</th>
+          <th scope="col">Materia</th>
+          <th scope="col">Calificación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        // Clase para representar una fila de la tabla
+        class Calificacion
+        {
+          public $matricula;
+          public $materia;
+          public $calificacion;
+
+          public function __construct($matricula, $materia, $calificacion)
+          {
+            $this->matricula = $matricula;
+            $this->materia = $materia;
+            $this->calificacion = $calificacion;
+          }
+        }
+
+        // Datos de ejemplo (puedes obtener estos datos de una base de datos o de alguna otra fuente)
+        $calificaciones = [
+          new Calificacion("123456", "Matemáticas", 90),
+          new Calificacion("789012", "Historia", 85),
+          new Calificacion("345678", "Ciencias", 92),
+          // Agrega más filas según sea necesario
+        ];
+
+        // Itera sobre las calificaciones y muestra cada fila en la tabla
+        foreach ($calificaciones as $calificacion) {
+          echo '<tr>';
+          echo '<td>' . $calificacion->matricula . '</td>';
+          echo '<td>' . $calificacion->materia . '</td>';
+          echo '<td>' . $calificacion->calificacion . '</td>';
+          echo '</tr>';
+        }
+        ?>
+      </tbody>
+    </table>
+
+  </div>
+
+
+
+  <!-- Agrega enlaces a los archivos de Bootstrap y jQuery (necesario para el funcionamiento del botón de navegación) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
