@@ -7,6 +7,7 @@ if (!isset($_SESSION['Matricula'])) { //Si la variable esta definida el usuario 
 }
 require_once('Connection/cdb.php')
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -38,7 +39,7 @@ require_once('Connection/cdb.php')
   
     <ul class="nav justify-content-end">
     <ul class="nav justify-content-end">
-    <a class="nav-link active" aria-current="page" href="Actions/SignOut.php">Capturar</a>
+    <a class="nav-link active" aria-current="page" href="RegistroCali.php">Capturar</a>
   </li>
 </ul>
 
@@ -101,6 +102,7 @@ require_once('Connection/cdb.php')
     </table>
 
   </div>
+  
 
 
 

@@ -1,21 +1,22 @@
 <?php
 class ConexionBD {
     private $conexion;
-    private $publicKeyPath;
+    private $publicKey;
+    private $privateKey;
 
-    public function __construct($db, $publicKeyPath) {
+    public function __construct($db) {
         $this->conexion = $db;
-        $this->publicKeyPath = $publicKeyPath;
+        
+        // Generar un par de claves
+        $keyPair = sodium_crypto_box_keypair();
+        $this->publicKey = sodium_crypto_box_publickey($keyPair);
+        $this->privateKey = sodium_crypto_box_secretkey($keyPair);
     }
 
     public function insertarUsuario($Matricula, $Materia, $Calificacion) {
         try {
-            // Obtener la clave pública
-            $publicKey = openssl_pkey_get_public(file_get_contents($this->publicKeyPath));
-
             // Cifrar la matrícula usando la clave pública
-            openssl_public_encrypt($Matricula, $Matricula_encrypted, $publicKey);
-
+            $Matricula_encrypted = sodium_crypto_box_seal($Matricula, $this->publicKey);
 
             $consulta = "INSERT INTO materias (Matricula, Materia, Calificacion) VALUES (?, ?, ?)";
             $declaracion = $this->conexion->prepare($consulta);
@@ -29,13 +30,20 @@ class ConexionBD {
             die("Error en la consulta: " . $e->getMessage());
         }
     }
+
+    // Método para obtener la clave pública
+    public function getPublicKey() {
+        return $this->publicKey;
+    }
+
+    // Método para obtener la clave privada
+    public function getPrivateKey() {
+        return $this->privateKey;
+    }
 }
 
 // Incluir la clase de conexión a la base de datos
 require_once('Connection/cdb.php');
-
-// Ruta a la clave pública
-$publicKeyPath = 'public_key.pem';
 
 // Crear una instancia de la clase Database
 $database = new Database();
@@ -43,15 +51,14 @@ $database = new Database();
 // Obtener la conexión a la base de datos
 $db = $database->getConnection();
 
-// Crear una instancia de la clase ConexionBD y pasarle la conexión y la clave pública
-$conexionBD = new ConexionBD($db, $publicKeyPath);
+// Crear una instancia de la clase ConexionBD y pasarle la conexión
+$conexionBD = new ConexionBD($db);
 
 // Procesar el formulario si se ha enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Matricula = $_POST["Matricula"];
     $Materia = $_POST["Materia"];
     $Calificacion = $_POST["Calificacion"];
-    
 
     // Insertar el nuevo usuario en la base de datos
     $registroExitoso = $conexionBD->insertarUsuario($Matricula, $Materia, $Calificacion);
@@ -65,6 +72,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mensajeError = "Error en el registro. Inténtalo de nuevo.";
     }
 }
+
+// Obtener la clave pública y privada para usar en la aplicación
+$publicKey = $conexionBD->getPublicKey();
+$privateKey = $conexionBD->getPrivateKey();
 ?>
 
 
@@ -84,9 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <!--- Favicon --->
     <link rel="icon" type="image/x-icon" href="img/user.png">
-    <!--- SweetAlert2 --->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Registrate</title>
+    <title>Registrar materias</title>
 </head>
 <body>
 <div class="container login shadow-lg p-3 mb-5 bg-body-tertiary rounded">
@@ -96,21 +105,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
         <div class="card-body">
         <form name="loginForm" method="POST">
-        <div class="mb-3">
-        <input type="text" class="form-control poppins-semibold" id="Matricula" name="Matricula" placeholder="Matricula escolar" pattern="[^&+/-]*">
-        </div>
-       
-        <div class="mb-3">
-        <input type="text" class="form-control poppins-semibold" id="Materia" name="Materia"  placeholder="Registar Materia">
+    <div class="mb-3">
+        <input type="text" class="form-control poppins-semibold" id="Matricula" name="Matricula" placeholder="Matricula escolar" autofocus required>
     </div>
-    <div>
-        <input type="text" class="form-control poppins-semibold" id="Calificacion" name="Calificacion" placeholder="Registar calificacion" >
-        </div>
-        </div>
-                <div class="d-grid gap-2 col-6 mx-auto">
-                    <button class="btn btn-primary btn-sm" type="submit" name="enviar"><h6>Iniciar sesión</h6></button>
-                </div>
-    </form>
+       
+    <div class="mb-3">
+        <input type="text" class="form-control poppins-semibold" id="Materia" name="Materia"  placeholder="Registrar Materia" required>
+    </div>
+    
+    <div class="mb-3">
+        <input type="text" class="form-control poppins-semibold" id="Calificacion" name="Calificacion" placeholder="Registrar calificacion" required >
+    </div>
+    
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <button class="btn btn-primary btn-sm" type="submit" name="enviar"><h6>Registrar materia</h6></button>
+    </div>
+</form>
+
 
     <!-- Muestra un mensaje de error si existe -->
     <?php if (isset($mensajeError)): ?>

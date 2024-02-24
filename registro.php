@@ -1,5 +1,4 @@
-
-    <?php
+   <?php
 class ConexionBD {
     private $conexion;
 
@@ -50,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($registroExitoso) {
         // Registro exitoso, redirigir a la página de inicio de sesión
-        header("Location: login.php");
+        header("Location: inicio.php");
         exit();
     } else {
         // Error en el registro, mostrar mensaje
@@ -100,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
         </div>
                 <div class="d-grid gap-2 col-6 mx-auto">
-                    <button class="btn btn-primary btn-sm" type="submit" name="enviar"><h6>Iniciar sesión</h6></button>
+                    <button class="btn btn-primary btn-sm" type="submit" name="enviar"><h6>Registrar usuario</h6></button>
                 </div>
     </form>
 
