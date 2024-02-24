@@ -4,19 +4,16 @@ class ConexionBD {
     private $publicKey;
     private $privateKey;
 
-    public function __construct($db) {
+    public function __construct($db, $publicKey, $privateKey) {
         $this->conexion = $db;
-        
-        // Generar un par de claves
-        $keyPair = sodium_crypto_box_keypair();
-        $this->publicKey = sodium_crypto_box_publickey($keyPair);
-        $this->privateKey = sodium_crypto_box_secretkey($keyPair);
+        $this->publicKey = $publicKey;
+        $this->privateKey = $privateKey;
     }
 
     public function insertarUsuario($Matricula, $Materia, $Calificacion) {
         try {
             // Cifrar la matrícula usando la clave pública
-            $Matricula_encrypted = sodium_crypto_box_seal($Matricula, $this->publicKey);
+            openssl_public_encrypt($Matricula, $Matricula_encrypted, $this->publicKey);
 
             $consulta = "INSERT INTO materias (Matricula, Materia, Calificacion) VALUES (?, ?, ?)";
             $declaracion = $this->conexion->prepare($consulta);
@@ -30,29 +27,21 @@ class ConexionBD {
             die("Error en la consulta: " . $e->getMessage());
         }
     }
-
-    // Método para obtener la clave pública
-    public function getPublicKey() {
-        return $this->publicKey;
-    }
-
-    // Método para obtener la clave privada
-    public function getPrivateKey() {
-        return $this->privateKey;
-    }
 }
 
 // Incluir la clase de conexión a la base de datos
 require_once('Connection/cdb.php');
 
-// Crear una instancia de la clase Database
-$database = new Database();
-
 // Obtener la conexión a la base de datos
+$database = new Database();
 $db = $database->getConnection();
 
-// Crear una instancia de la clase ConexionBD y pasarle la conexión
-$conexionBD = new ConexionBD($db);
+// Claves pública y privada
+$publicKey = file_get_contents('public_key.pem'); // Ruta a tu archivo de clave pública
+$privateKey = file_get_contents('private_key.pem'); // Ruta a tu archivo de clave privada
+
+// Crear una instancia de la clase ConexionBD y pasarle la conexión y las claves
+$conexionBD = new ConexionBD($db, $publicKey, $privateKey);
 
 // Procesar el formulario si se ha enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -72,13 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mensajeError = "Error en el registro. Inténtalo de nuevo.";
     }
 }
-
-// Obtener la clave pública y privada para usar en la aplicación
-$publicKey = $conexionBD->getPublicKey();
-$privateKey = $conexionBD->getPrivateKey();
 ?>
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
