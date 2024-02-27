@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($registroExitoso) {
         // Registro exitoso, redirigir a la página de inicio de sesión
-        header("Location: inicio.php");
+        header("Location: login.php");
         exit();
     } else {
         // Error en el registro, mostrar mensaje

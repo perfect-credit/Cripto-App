@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 // Si ya hay una sesión activa, redirigir al usuario a la página de inicio
 if (isset($_SESSION['Matricula'])) {
     header("Location: inicio.php");

@@ -13,23 +13,28 @@ class ConexionBD {
         $this->privateKey = sodium_crypto_box_secretkey($keyPair);
     }
 
-    public function insertarUsuario($Matricula, $Materia, $Calificacion) {
+    public function insertarUsuario($Matricula, $Materia, $Calificacion, $matriculaReal) {
         try {
             // Cifrar la matrícula usando la clave pública
             $Matricula_encrypted = sodium_crypto_box_seal($Matricula, $this->publicKey);
-
-            $consulta = "INSERT INTO materias (Matricula, Materia, Calificacion) VALUES (?, ?, ?)";
+            
+            // Descifrar la matrícula encriptada para obtener la matrícula real
+            $matriculaReal_decrypted = sodium_crypto_box_seal_open($Matricula_encrypted, sodium_crypto_box_keypair_from_secretkey_and_publickey($this->privateKey, $this->publicKey));
+    
+            $consulta = "INSERT INTO materias (Matricula, Materia, Calificacion, matriculaReal) VALUES (?, ?, ?, ?)";
             $declaracion = $this->conexion->prepare($consulta);
             $declaracion->bindParam(1, $Matricula_encrypted);
             $declaracion->bindParam(2, $Materia);
             $declaracion->bindParam(3, $Calificacion);
-
+            $declaracion->bindParam(4, $matriculaReal_decrypted);
+    
             $declaracion->execute();
             return true;
         } catch (PDOException $e) {
             die("Error en la consulta: " . $e->getMessage());
         }
     }
+    
 
     // Método para obtener la clave pública
     public function getPublicKey() {
@@ -59,9 +64,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Matricula = $_POST["Matricula"];
     $Materia = $_POST["Materia"];
     $Calificacion = $_POST["Calificacion"];
+    $matriculaReal = $_POST["matriculaReal"];
 
     // Insertar el nuevo usuario en la base de datos
-    $registroExitoso = $conexionBD->insertarUsuario($Matricula, $Materia, $Calificacion);
+    $registroExitoso = $conexionBD->insertarUsuario($Matricula, $Materia, $Calificacion, $matriculaReal);
 
     if ($registroExitoso) {
         // Registro exitoso, redirigir a la página de inicio de sesión
@@ -77,6 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $publicKey = $conexionBD->getPublicKey();
 $privateKey = $conexionBD->getPrivateKey();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -119,11 +126,14 @@ $privateKey = $conexionBD->getPrivateKey();
     <div class="d-grid gap-2 col-6 mx-auto">
         <button class="btn btn-primary btn-sm" type="submit" name="enviar"><h6>Registrar materia</h6></button>
     </div>
-
-    <div class="d-grid gap-2 col-6 mx-auto">
+</form>
+<hr>
+<form action="inicio.php">
+<div class="d-grid gap-2 col-6 mx-auto">
         <button class="btn btn-primary btn-sm" href="inicio.php" type="submit" name="enviar"><h6>Volver al inicio</h6></button>
     </div>
 </form>
+
 
 
     <!-- Muestra un mensaje de error si existe -->

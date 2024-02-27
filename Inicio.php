@@ -1,7 +1,7 @@
 <?php
 ini_set('session.cookie_lifetime', 0); //Se define el tiempo de vida de la sesion iniciada, al momento que pasa el tiempo o cierras la ventana se cerrara la sesion
 session_start(); //Reanuda la sesion existente
-if (!isset($_SESSION[''])) { //Si la variable esta definida el usuario puede permanecer en el sitio, si la variable de sesion de "NumeroEmpleado" no esta iniciada lo devuelve a la pagina de inicio
+if (!isset($_SESSION['Matricula'])) { //Si la variable esta definida el usuario puede permanecer en el sitio, si la variable de sesion de "NumeroEmpleado" no esta iniciada lo devuelve a la pagina de inicio
   header("Location: login.php"); //Ubicacion que redirrecciona si la sesion no esta iniciada
   exit(); //Termina el script actual
 }
@@ -51,14 +51,20 @@ require_once('Connection/cdb.php')
   </div>
 </nav>
 
-<div class="container mt-5">
-    <h1 class="text-center">Tabla de Calificaciones</h1>
+<?php
+// Crear una instancia de la clase Database para obtener la conexión
+$database = new Database();
+$db = $database->getConnection();
 
-  <?php
-require_once 'Login.php'; // Asegúrate de que la clase Materias esté incluida
+// Consulta SQL para obtener los datos de la tabla "materias"
+$query = "SELECT idMatricula, Matricula, matriculaReal, Materia, Calificacion FROM materias";
 
-$materiasObj = new Materias();
-$materias = $materiasObj->obtenerMaterias();
+// Preparar y ejecutar la consulta
+$stmt = $db->prepare($query);
+$stmt->execute();
+
+// Obtener los resultados de la consulta
+$materias = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <div class="container mt-5">
@@ -67,6 +73,7 @@ $materias = $materiasObj->obtenerMaterias();
     <table class="table">
         <thead>
             <tr>
+                <th scope="col">ID</th>
                 <th scope="col">Matrícula</th>
                 <th scope="col">Materia</th>
                 <th scope="col">Calificación</th>
@@ -75,7 +82,8 @@ $materias = $materiasObj->obtenerMaterias();
         <tbody>
             <?php foreach ($materias as $materia): ?>
                 <tr>
-                    <td><?php echo $materia['Matricula']; ?></td>
+                    <td><?php echo $materia['idMatricula']; ?></td>
+                    <td><?php echo $materia['matriculaReal']; ?></td>
                     <td><?php echo $materia['Materia']; ?></td>
                     <td><?php echo $materia['Calificacion']; ?></td>
                 </tr>
@@ -83,6 +91,7 @@ $materias = $materiasObj->obtenerMaterias();
         </tbody>
     </table>
 </div>
+
 
 
   
