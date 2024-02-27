@@ -119,6 +119,9 @@ $privateKey = $conexionBD->getPrivateKey();
     <div class="d-grid gap-2 col-6 mx-auto">
         <button class="btn btn-primary btn-sm" type="submit" name="enviar"><h6>Registrar materia</h6></button>
     </div>
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <button class="btn btn-primary btn-sm" href="inicio.php" type="submit" name="enviar"><h6>Registrar materia</h6></button>
+    </div>
 </form>
 
 

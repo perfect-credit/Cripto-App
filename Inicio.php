@@ -1,7 +1,7 @@
 <?php
 ini_set('session.cookie_lifetime', 0); //Se define el tiempo de vida de la sesion iniciada, al momento que pasa el tiempo o cierras la ventana se cerrara la sesion
 session_start(); //Reanuda la sesion existente
-if (!isset($_SESSION['Matricula'])) { //Si la variable esta definida el usuario puede permanecer en el sitio, si la variable de sesion de "NumeroEmpleado" no esta iniciada lo devuelve a la pagina de inicio
+if (!isset($_SESSION[''])) { //Si la variable esta definida el usuario puede permanecer en el sitio, si la variable de sesion de "NumeroEmpleado" no esta iniciada lo devuelve a la pagina de inicio
   header("Location: login.php"); //Ubicacion que redirrecciona si la sesion no esta iniciada
   exit(); //Termina el script actual
 }
@@ -48,60 +48,43 @@ require_once('Connection/cdb.php')
     <a class="nav-link active" aria-current="page" href="Actions/SignOut.php">Cerrar sesión</a>
   </li>
 </ul>
-
-
   </div>
 </nav>
 
 <div class="container mt-5">
     <h1 class="text-center">Tabla de Calificaciones</h1>
 
+  <?php
+require_once 'Login.php'; // Asegúrate de que la clase Materias esté incluida
+
+$materiasObj = new Materias();
+$materias = $materiasObj->obtenerMaterias();
+?>
+
+<div class="container mt-5">
+    <h1 class="text-center">Tabla de Calificaciones</h1>
+
     <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Matrícula</th>
-          <th scope="col">Materia</th>
-          <th scope="col">Calificación</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php
-        // Clase para representar una fila de la tabla
-        class Calificacion
-        {
-          public $matricula;
-          public $materia;
-          public $calificacion;
-
-          public function __construct($matricula, $materia, $calificacion)
-          {
-            $this->matricula = $matricula;
-            $this->materia = $materia;
-            $this->calificacion = $calificacion;
-          }
-        }
-
-        // Datos de ejemplo (puedes obtener estos datos de una base de datos o de alguna otra fuente)
-        $calificaciones = [
-          new Calificacion("123456", "Matemáticas", 90),
-          new Calificacion("789012", "Historia", 85),
-          new Calificacion("345678", "Ciencias", 92),
-          // Agrega más filas según sea necesario
-        ];
-
-        // Itera sobre las calificaciones y muestra cada fila en la tabla
-        foreach ($calificaciones as $calificacion) {
-          echo '<tr>';
-          echo '<td>' . $calificacion->matricula . '</td>';
-          echo '<td>' . $calificacion->materia . '</td>';
-          echo '<td>' . $calificacion->calificacion . '</td>';
-          echo '</tr>';
-        }
-        ?>
-      </tbody>
+        <thead>
+            <tr>
+                <th scope="col">Matrícula</th>
+                <th scope="col">Materia</th>
+                <th scope="col">Calificación</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($materias as $materia): ?>
+                <tr>
+                    <td><?php echo $materia['Matricula']; ?></td>
+                    <td><?php echo $materia['Materia']; ?></td>
+                    <td><?php echo $materia['Calificacion']; ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
     </table>
+</div>
 
-  </div>
+
   
 
 

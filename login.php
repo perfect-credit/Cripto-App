@@ -50,7 +50,7 @@ require_once('Connection/cdb.php'); // Incluye el archivo de conexión a la base
                 </div>
                 <!--- Código de inicio de sesión--->
                 
-                <?php
+        <?php
 
 class Authenticator {
     private $conn;
